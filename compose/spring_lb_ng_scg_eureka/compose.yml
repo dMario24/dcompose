@@ -27,11 +27,32 @@ services:
 
   sc-eureka:
     image: datamario24/sc-eureka:0.1.0
+    container_name: sc-eureka
     ports:
       - "8765:8765"
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://sc-eureka:8765/eurek
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://sc-eureka:8765/eureka
 
+  sc-user-svc:
+    image: datamario24/sc-user-svc:0.1.0
+    #container_name: sc-user-svc
+    #ports:
+    #  - "9001:9001"
+    depends_on:
+      - sc-eureka
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://sc-eureka:8765/eureka
+      - SERVER_PORT=9001
+    deploy:
+      mode: replicated
+      replicas: 2 # https://docs.docker.com/compose/compose-file/deploy/#replicas
+      resources: # https://docs.docker.com/compose/compose-file/compose-file-v3/#resources
+        limits:
+          cpus: '0.5'
+          memory: 300M
+        reservations:
+          cpus: '0.01'
+          memory: 250M
   blog:
     # build: ../../docker_file/httpd
     image: datamario24/spring-rest-api:0.3.1
@@ -54,7 +75,7 @@ services:
       - VIRTUAL_PORT=8080
 
   controller:
-    image: ngrinder/controller:3.5.8
+    image: ngrinder/controller:3.5.9-p1
     platform: linux/amd64
     restart: always
     ports:
@@ -63,8 +84,9 @@ services:
       - "12000-12009:12000-12009"
     volumes:
       - ./ngrinder-controller:/opt/ngrinder-controller
+
   agent:
-    image: ngrinder/agent:3.5.8
+    image: ngrinder/agent:3.5.9-p1
     platform: linux/amd64
     restart: always
     links:
