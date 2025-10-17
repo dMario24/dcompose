@@ -45,9 +45,12 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://sc-eureka:8765/eureka
       - SERVER_PORT=9001
       - CPU_STRESS_NUMBER=500
+      - LOGGING_LEVEL_ROOT=INFO
+      - LOGGING_LEVEL_COM_EXAMPLE_USER_SERVICE=DEBUG # 사용자 패키지를 DEBUG로 설정
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB=DEBUG  # Spring Web 관련 로그를 상세히 보고 싶을 때 추가
     deploy:
       mode: replicated
-      replicas: 1 # https://docs.docker.com/compose/compose-file/deploy/#replicas
+      replicas: 2 # https://docs.docker.com/compose/compose-file/deploy/#replicas
       resources: # https://docs.docker.com/compose/compose-file/compose-file-v3/#resources
         limits:
           cpus: '0.5'
