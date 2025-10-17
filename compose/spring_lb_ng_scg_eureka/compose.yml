@@ -16,7 +16,7 @@ services:
           memory: 20M
 
   scg-proxy:
-    image: datamario24/sc-gateway:0.4.0
+    image: datamario24/sc-gateway:0.5.1
     ports:
       - "9000:9000"
     depends_on:
@@ -35,7 +35,7 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://sc-eureka:8765/eureka
 
   sc-user-svc:
-    image: datamario24/sc-user-svc:0.1.0
+    image: datamario24/sc-user-svc:0.2.0
     #container_name: sc-user-svc
     #ports:
     #  - "9001:9001"
@@ -44,9 +44,10 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://sc-eureka:8765/eureka
       - SERVER_PORT=9001
+      - CPU_STRESS_NUMBER=500
     deploy:
       mode: replicated
-      replicas: 2 # https://docs.docker.com/compose/compose-file/deploy/#replicas
+      replicas: 1 # https://docs.docker.com/compose/compose-file/deploy/#replicas
       resources: # https://docs.docker.com/compose/compose-file/compose-file-v3/#resources
         limits:
           cpus: '0.5'
