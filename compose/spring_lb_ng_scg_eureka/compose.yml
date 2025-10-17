@@ -16,7 +16,7 @@ services:
           memory: 20M
 
   scg-proxy:
-    image: datamario24/sc-gateway:0.3.0
+    image: datamario24/sc-gateway:0.4.0
     ports:
       - "9000:9000"
     depends_on:
@@ -24,6 +24,7 @@ services:
       - sc-eureka
     environment:
       - HELLO_SERVICE_URI=http://awsgoo-blog-1:8080
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://sc-eureka:8765/eureka
 
   sc-eureka:
     image: datamario24/sc-eureka:0.1.0
