@@ -1,11 +1,9 @@
-name: awsgoo
+name: gw
 services:
   nginx-proxy:
     build: ../../docker_file/nginx_compose
     ports:
       - "9889:80"
-    depends_on:
-      - blog
     deploy:
       resources:
         limits:
@@ -20,10 +18,9 @@ services:
     ports:
       - "9000:9000"
     depends_on:
-      - blog
       - sc-eureka
     environment:
-      - HELLO_SERVICE_URI=http://awsgoo-blog-1:8080
+      - HELLO_SERVICE_URI=http://172.31.33.214:9001
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://sc-eureka:8765/eureka
 
   sc-eureka:
@@ -34,67 +31,3 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://sc-eureka:8765/eureka
 
-  sc-user-svc:
-    image: datamario24/sc-user-svc:0.2.0
-    #container_name: sc-user-svc
-    #ports:
-    #  - "9001:9001"
-    depends_on:
-      - sc-eureka
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://sc-eureka:8765/eureka
-      - SERVER_PORT=9001
-      - CPU_STRESS_NUMBER=500
-      - LOGGING_LEVEL_ROOT=INFO
-      - LOGGING_LEVEL_COM_EXAMPLE_USER_SERVICE=DEBUG # 사용자 패키지를 DEBUG로 설정
-      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB=DEBUG  # Spring Web 관련 로그를 상세히 보고 싶을 때 추가
-    deploy:
-      mode: replicated
-      replicas: 1 # https://docs.docker.com/compose/compose-file/deploy/#replicas
-      resources: # https://docs.docker.com/compose/compose-file/compose-file-v3/#resources
-        limits:
-          cpus: '0.5'
-          memory: 300M
-        reservations:
-          cpus: '0.01'
-          memory: 250M
-  blog:
-    # build: ../../docker_file/httpd
-    image: datamario24/spring-rest-api:0.5.0
-    ports:
-      - "9765:8080"
-    deploy:
-      mode: replicated
-      replicas: 1 # https://docs.docker.com/compose/compose-file/deploy/#replicas
-      resources: # https://docs.docker.com/compose/compose-file/compose-file-v3/#resources
-        limits:
-          cpus: '0.1'
-          memory: 500M
-        reservations:
-          cpus: '0.01'
-          memory: 30M
-    expose:
-      - "8080"
-    environment:
-      - VIRTUAL_HOST=aws.abcdef.com,aws.google.com,localhost
-      - VIRTUAL_PORT=8080
-      #- CPU_STRESS_NUMBER=50000
-      - CPU_STRESS_NUMBER=500
-
-  controller:
-    image: ngrinder/controller:3.5.9-p1
-    platform: linux/amd64
-    restart: always
-    ports:
-      - "8300:80"
-      - "16001:16001"
-      - "12000-12009:12000-12009"
-    volumes:
-      - ./ngrinder-controller:/opt/ngrinder-controller
-
-  agent:
-    image: ngrinder/agent:3.5.9-p1
-    platform: linux/amd64
-    restart: always
-    links:
-      - controller
